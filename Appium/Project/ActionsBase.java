@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.Arrays;
 
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Pause;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
@@ -18,14 +19,47 @@ public class ActionsBase {
     private final static PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
     private final static PointerInput pointer = new PointerInput(PointerInput.Kind.TOUCH, "pointer");
     
-    public static void doSwipe(AppiumDriver driver, Point start, Point end, int duration) {
+    /*public static void doSwipe(AppiumDriver driver, Point start, Point end, int duration) {
         Sequence swipe = new Sequence(finger, 1)
             .addAction(finger.createPointerMove(ofMillis(0), viewport(), start.getX(), start.getY()))
             .addAction(finger.createPointerDown(LEFT.asArg()))
             .addAction(finger.createPointerMove(ofMillis(duration), viewport(), end.getX(), end.getY()))
             .addAction(finger.createPointerUp(LEFT.asArg()));
         driver.perform(Arrays.asList(swipe));
+    }*/
+    
+    public static void progressBar(AppiumDriver driver, WebElement seekBar, double percentage, int duration) {
+        // Get SeekBar dimensions and position
+        int startX = seekBar.getLocation().getX();
+        int startY = seekBar.getLocation().getY();
+        int width = seekBar.getSize().getWidth();
+        int height = seekBar.getSize().getHeight();
+
+        // Calculate center Y and target X based on percentage
+        int centerY = startY + height / 2;
+        int targetX = startX + (int)(width * percentage);
+
+        Point start = new Point(startX, centerY);
+        Point end = new Point(targetX, centerY);
+
+        // Create W3C Action to swipe
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence swipe = new Sequence(finger, 1)
+            .addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), start.getX(), start.getY()))
+            .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()))
+            .addAction(finger.createPointerMove(Duration.ofMillis(duration), PointerInput.Origin.viewport(), end.getX(), end.getY()))
+            .addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        driver.perform(Arrays.asList(swipe));
     }
+  /* public static void Sequence drag = new Sequence(finger, 1)
+            // Move finger to start of SeekBar
+            .addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, y))
+            .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()))
+            // Drag to target position smoothly
+            .addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), targetX, y))
+            .addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+    */
  // Create the long press action function
     public static void doLongPress(AppiumDriver driver, Point start) {
         // Create s sequence of actions
